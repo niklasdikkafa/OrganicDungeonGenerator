@@ -16,7 +16,7 @@ import java.util.List;
  *
  * <h2>Collision model</h2>
  * <ul>
- *   <li><b>2D:</b> AABB of the room's inner polygon expanded by its wall thickness.</li>
+ *   <li><b>2D:</b> AABB of the room's outer polygon.</li>
  *   <li><b>Z:</b> Interval from {@code zLevel - floorThickness} to
  *       {@code zLevel + height + floorThickness}.</li>
  * </ul>
@@ -65,8 +65,8 @@ public final class RoomValidator {
     /**
      * Checks whether two rooms overlap in the horizontal plane using expanded AABBs.
      * <p>
-     * Each room is approximated by the axis-aligned bounding box (AABB) of its inner footprint,
-     * expanded by its wall thickness. This is a conservative broad-phase test:
+     * Each room is approximated by the axis-aligned bounding box (AABB) of its outer footprint.
+     * This is a conservative broad-phase test:
      * it may report overlap even if the actual polygons do not intersect (false positives),
      * but it is fast and allocation-light.
      * </p>
@@ -76,29 +76,26 @@ public final class RoomValidator {
      * @return {@code true} if the expanded AABBs intersect; {@code false} if they are separated in 2D
      */
     private static boolean aabbOverlap2D(Room a, Room b) {
-        Envelope A = envelopeOf(a.getInnerCorners(), a.getWallThickness());
-        Envelope B = envelopeOf(b.getInnerCorners(), b.getWallThickness());
+        Envelope A = envelopeOf(a.getOuterCorners());
+        Envelope B = envelopeOf(b.getOuterCorners());
         return A.intersects(B);
     }
 
     /**
-     * Computes the axis-aligned bounding box (AABB) of a 2D polygon and expands it by a margin.
+     * Computes the axis-aligned bounding box (AABB) of a 2D polygon.
      * <p>
      * The input polygon is given as a list of points in the X/Y plane. The returned {@link Envelope}
-     * bounds all points and is then expanded uniformly by {@code expand} in both axes.
-     * This expansion is used to conservatively account for wall thickness around the inner footprint.
+     * bounds all points.
      * </p>
      *
-     * @param poly polygon vertices in the X/Y plane (typically {@code Room#getInnerCorners()})
-     * @param expand symmetric expansion margin applied to the envelope in X and Y
-     * @return expanded AABB envelope of the polygon
+     * @param poly polygon vertices in the X/Y plane (typically {@code Room#getOuterCorners()})
+     * @return AABB envelope of the polygon
      */
-    private static Envelope envelopeOf(List<Vector2f> poly, float expand) {
+    private static Envelope envelopeOf(List<Vector2f> poly) {
         Envelope env = new Envelope();
         for (Vector2f v : poly) {
             env.expandToInclude(v.x, v.y);
         }
-        env.expandBy(expand);
         return env;
     }
 

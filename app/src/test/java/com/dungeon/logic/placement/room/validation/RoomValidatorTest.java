@@ -28,7 +28,7 @@ class RoomValidatorTest {
     private static Room room(float cx, float cy, float hw, float hh,
                              float zMin, float zMax) {
         Room r = mock(Room.class);
-        // inner corners: unit square around (cx, cy)
+        // outer corners: unit square around (cx, cy)
         List<Vector2f> corners = List.of(
                 new Vector2f(cx - hw, cy - hh),
                 new Vector2f(cx + hw, cy - hh),
@@ -36,6 +36,7 @@ class RoomValidatorTest {
                 new Vector2f(cx - hw, cy + hh)
         );
         when(r.getInnerCorners()).thenReturn(corners);
+        when(r.getOuterCorners()).thenReturn(corners);
         when(r.getWallThickness()).thenReturn(0f);
         when(r.getZLevel()).thenReturn(zMin);
         when(r.getHeight()).thenReturn(zMax - zMin);
@@ -103,6 +104,9 @@ class RoomValidatorTest {
             when(a.getInnerCorners()).thenReturn(List.of(
                     new Vector2f(0,0), new Vector2f(1,0),
                     new Vector2f(1,1), new Vector2f(0,1)));
+            when(a.getOuterCorners()).thenReturn(List.of(
+                    new Vector2f(-1,-1), new Vector2f(2,-1),
+                    new Vector2f(2,2), new Vector2f(-1,2)));
             when(a.getWallThickness()).thenReturn(1f);
             when(a.getZLevel()).thenReturn(0.0f);
             when(a.getHeight()).thenReturn(1.0f);
@@ -112,6 +116,9 @@ class RoomValidatorTest {
             when(b.getInnerCorners()).thenReturn(List.of(
                     new Vector2f(3,0), new Vector2f(4,0),
                     new Vector2f(4,1), new Vector2f(3,1)));
+            when(b.getOuterCorners()).thenReturn(List.of(
+                    new Vector2f(2,-1), new Vector2f(2,2),
+                    new Vector2f(5,2), new Vector2f(5,-1)));
             when(b.getWallThickness()).thenReturn(1f);
             when(b.getZLevel()).thenReturn(0.0f);
             when(b.getHeight()).thenReturn(1.0f);
@@ -161,7 +168,7 @@ class RoomValidatorTest {
             Room b = mock(Room.class);
 
             // a: z=[0,2], floor=1 -> effective [−1, 3]
-            when(a.getInnerCorners()).thenReturn(List.of(
+            when(a.getOuterCorners()).thenReturn(List.of(
                     new Vector2f(0,0), new Vector2f(1,0),
                     new Vector2f(1,1), new Vector2f(0,1)));
             when(a.getWallThickness()).thenReturn(0f);
@@ -170,7 +177,7 @@ class RoomValidatorTest {
             when(a.getFloorThickness()).thenReturn(1f);
 
             // b: z=[3.5,5], floor=1 -> effective [2.5, 6]
-            when(b.getInnerCorners()).thenReturn(List.of(
+            when(b.getOuterCorners()).thenReturn(List.of(
                     new Vector2f(0,0), new Vector2f(1,0),
                     new Vector2f(1,1), new Vector2f(0,1)));
             when(b.getWallThickness()).thenReturn(0f);
