@@ -192,7 +192,7 @@ public final class CorridorNetworkBuilder {
             for (GraphNode n : g.nodes) nextPos[n.id] = n.position.clone();
 
             for (GraphNode n : g.nodes) {
-                if (n.isEndpoint) continue;
+                if (n.isEndpoint || n.isJunction) continue;
 
                 List<GraphEdge> adj = g.adjacency.get(n.id);
                 if (adj == null || adj.isEmpty()) continue;
@@ -206,6 +206,8 @@ public final class CorridorNetworkBuilder {
                     float w = 1f;
                     if (nb.isJunction) {
                         w = 0.6f;
+                    } else if (nb.isEndpoint) {
+                        w = 0.8f;
                     }
 
                     sumX += nb.position.x * w;
