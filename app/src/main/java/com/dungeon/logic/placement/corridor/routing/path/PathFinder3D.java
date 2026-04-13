@@ -598,11 +598,14 @@ public final class PathFinder3D {
                     int zFrom = unpackZ(par, zBands);
                     int zTo   = unpackZ(cur, zBands);
 
+                    int zFromMin = Math.min(zFrom, zTo);
+                    int zFromMax = Math.max(zFrom, zTo);
+
                     int b = macroBPoly[cur];
                     int c = macroCPoly[cur];
 
-                    // B/C are blocked on both z bands
-                    if ((poly == b || poly == c) && (z == zFrom || z == zTo)) {
+                    // B/C are blocked on both z bands + border below and above to prevent adjacency
+                    if ((poly == b || poly == c) && (z == zFromMin || z == zFromMax || z == zFromMin - 1 || z == zFromMax + 1)) {
                         return true;
                     }
                 }
