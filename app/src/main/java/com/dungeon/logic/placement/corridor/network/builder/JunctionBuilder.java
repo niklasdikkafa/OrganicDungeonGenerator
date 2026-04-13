@@ -420,7 +420,7 @@ public class JunctionBuilder {
     }
 
     /**
-     * Sorts portals by polar angle around {@code center} in the XZ plane.
+     * Sorts portals by polar angle around {@code center} in the XZ plane (CCW).
      *
      * @param portals portals to sort (modified in place)
      * @param center  junction component center
