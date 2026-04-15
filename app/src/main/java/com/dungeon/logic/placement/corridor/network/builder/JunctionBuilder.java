@@ -96,8 +96,8 @@ public class JunctionBuilder {
         net.junctionLinksByJunctionAndPortal.clear();
 
         // Scale thresholds by both corridor cross-section and routing resolution to keep behavior stable.
-        JUNCTION_MIN_CORNER_DIST = Math.max(0.05f * CORRIDOR_WIDTH, 0.05f * routingGridEdgeLength);
-        JUNCTION_CHAMFER_BACKOFF = Math.max(0.25f * CORRIDOR_WIDTH, 0.05f * routingGridEdgeLength);
+        JUNCTION_MIN_CORNER_DIST = Math.max(0.05f * CORRIDOR_WIDTH, 0.02f * routingGridEdgeLength);
+        JUNCTION_CHAMFER_BACKOFF = Math.max(0.25f * CORRIDOR_WIDTH, 0.02f * routingGridEdgeLength);
         JUNCTION_FALLBACK_LEN    = Math.max(3.0f  * CORRIDOR_WIDTH, routingGridEdgeLength);
 
         CorridorGraph g = net.graph;
@@ -584,7 +584,9 @@ public class JunctionBuilder {
      *
      * <p>The chamfer point is placed {@link #JUNCTION_CHAMFER_BACKOFF} units before the intersection (along the segment),
      * but never closer than {@link #JUNCTION_MIN_CORNER_DIST} to {@code start}. The Y component is taken from {@code y},
-     * while X/Z are interpolated along the segment.</p>
+     * while X/Z are interpolated along the segment. If the calculated {@code fraction} would result in a chamfer point
+     * that is not on the segment or if the distance between {@code start} and {@code intersectionXZ} is 0, it will be
+     * set to 0.5 (i.e. the chamfer point will get set in the middle of the vector {@code start}->{@code intersectionXZ}).</p>
      *
      * @param start          3D segment start (uses {@code x} and {@code z})
      * @param intersectionXZ intersection point in XZ ({@code x}=X, {@code y}=Z)
@@ -594,6 +596,10 @@ public class JunctionBuilder {
     private static Vector3f chamferPoint(Vector3f start, Vector2f intersectionXZ, float y) {
         LineSegment seg = new LineSegment(start.x, start.z, intersectionXZ.x, intersectionXZ.y);
         double d = seg.getLength();
+        if (d == 0) {
+            Coordinate p = seg.pointAlong(0.5);
+            return new Vector3f((float) p.x, y, (float) p.y);
+        }
         double target = Math.max(JUNCTION_MIN_CORNER_DIST, d - JUNCTION_CHAMFER_BACKOFF);
         if (!Double.isFinite(target)) target = JUNCTION_MIN_CORNER_DIST;
 
