@@ -1,0 +1,73 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.14'
+}
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17) // oder 21, je nach Projekt
+    }
+}
+
+javafx {
+    version = "17.0.10"
+    modules = [ 'javafx.graphics' ]  // Color ist in javafx.graphics
+}
+
+dependencies {
+
+    // JME3
+    implementation "org.jmonkeyengine:jme3-core:3.6.1-stable"
+    implementation "org.jmonkeyengine:jme3-desktop:3.6.1-stable"
+    implementation "org.jmonkeyengine:jme3-lwjgl3:3.6.1-stable"
+    implementation "org.jmonkeyengine:jme3-effects:3.6.1-stable"
+    implementation "org.jmonkeyengine:jme3-jogg:3.6.1-stable"
+
+    implementation "org.locationtech.jts:jts-core:1.19.0"
+
+    implementation "org.jgrapht:jgrapht-core:1.5.2"
+
+    implementation "eu.mihosoft.vrl.jcsg:jcsg:0.5.7"
+
+    // Test-Framework
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+    testImplementation 'org.mockito:mockito-core:5.12.0'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
+    test {
+        useJUnitPlatform()
+    }
+
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+java {
+    toolchain { languageVersion = JavaLanguageVersion.of(22) }
+}
+
+tasks.withType(JavaExec).configureEach {
+    javaLauncher = javaToolchains.launcherFor {
+        languageVersion = JavaLanguageVersion.of(22)
+    }
+    jvmArgs "-XstartOnFirstThread"
+}
+
+application {
+    mainClass = 'com.dungeon.application.OrganicDungeonGenerator'
+}
+
+run {
+    jvmArgs = ["-XstartOnFirstThread"]
+}
+
+test {
+    useJUnitPlatform()
+}
+
