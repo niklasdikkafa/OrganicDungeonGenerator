@@ -88,8 +88,8 @@ public class RoomOutlineBuilder {
                 }
             }
 
-            // Case 2: if the local degree is > 2, try to choose a neighbor that looks like a boundary continuation.
-            // Heuristic: prefer a candidate whose own degree is 2 (likely part of the boundary cycle).
+            // Case 2 (fallback): if the local degree is > 2, try to choose a neighbor that looks like a boundary continuation.
+            // This should never be the case because there should always be two valid neighbors for a quad grid.
             if (next == null && neighbors.size() > 2) {
                 for (Polygon candidate : neighbors) {
                     if (!remaining.contains(candidate)) continue;
