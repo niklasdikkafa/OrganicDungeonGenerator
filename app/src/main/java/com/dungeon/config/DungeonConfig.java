@@ -31,6 +31,7 @@ public final class DungeonConfig {
     /**
      * Thickness of walls.
      * Used during geometry generation and collision/clearance checks.
+     * This value should always be way less than Z_BAND_HEIGHT/2 to ensure that corridors do not collide vertically.
      */
     public static final float WALL_THICKNESS = 0.3f;
 
