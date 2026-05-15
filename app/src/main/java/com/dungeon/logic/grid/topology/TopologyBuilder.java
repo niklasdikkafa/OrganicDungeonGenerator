@@ -11,8 +11,6 @@ import java.util.*;
  */
 public final class TopologyBuilder {
 
-    private TopologyBuilder(){}
-
     /**
      * Result of building topology maps.
      */
