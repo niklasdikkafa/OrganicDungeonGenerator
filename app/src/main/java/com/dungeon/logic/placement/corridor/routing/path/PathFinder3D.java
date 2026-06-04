@@ -188,7 +188,7 @@ public final class PathFinder3D {
                         closed, open);
             }
 
-            // 2) NEW stairs macro moves (A -> D directly), no cooldown
+            // 2) Stairs macro moves (A -> D directly)
             if (canStartNewStairsFrom(grid, curPoly, curZ)) {
                 for (int dz : new int[]{-1, +1}) {
                     int toZ = curZ + dz;
