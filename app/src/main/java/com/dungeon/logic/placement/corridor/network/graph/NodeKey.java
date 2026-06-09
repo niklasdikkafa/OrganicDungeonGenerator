@@ -2,8 +2,7 @@ package com.dungeon.logic.placement.corridor.network.graph;
 
 import com.dungeon.logic.placement.corridor.network.path.PathPoint3D;
 
-import static com.dungeon.config.DungeonConfig.CORRIDOR_HEIGHT;
-import static com.dungeon.config.DungeonConfig.Z_BAND_HEIGHT;
+import static com.dungeon.config.DungeonConfig.*;
 
 /**
  * Stable, semantic identity key for a {@link com.dungeon.logic.placement.corridor.network.graph.GraphNode}.
@@ -67,7 +66,7 @@ public final class NodeKey {
      * Quantizes a world-space {@code y} coordinate into a discrete key.
      * <p>
      * Uses {@code Z_BAND_HEIGHT / 4} granularity to support quarter-step stair points.
-     * The offset {@code CORRIDOR_HEIGHT * 0.5} aligns the quantization origin with the
+     * The offset {@code CORRIDOR_HEIGHT * 0.5 + C_REDUCER * 0.5} aligns the quantization origin with the
      * corridor voxel-center convention.
      * </p>
      *
@@ -75,8 +74,8 @@ public final class NodeKey {
      * @return quantized vertical key
      */
     private static int quantizeYKey(float y) {
-        float unit = Z_BAND_HEIGHT / 4f;         // stair points can be at quarter steps of a voxel
-        float base = CORRIDOR_HEIGHT * 0.5f;     // same offset as voxelCenterY
+        float unit = Z_BAND_HEIGHT / 4f;                            // stair points can be at quarter steps of a voxel
+        float base = CORRIDOR_HEIGHT * 0.5f + C_REDUCER * 0.5f;     // same offset as voxelCenterY
         return Math.round((y - base) / unit);
     }
 
