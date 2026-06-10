@@ -324,7 +324,7 @@ public class JunctionBuilder {
             if (nbId == startId && path.size() >= minSize) {
                 List<Integer> cycle = new ArrayList<>(path);
                 if (seen.add(canonicalCycleKey(cycle))) result.add(cycle);
-            } else if (!onPath.contains(nbId) && nbId >= startId) {
+            } else if (!onPath.contains(nbId)) {
                 dfsCycles(startId, nbId, junctionIds, g, path, onPath, result, seen, minSize);
             }
         }

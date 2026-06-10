@@ -308,6 +308,56 @@ class JunctionBuilderTest {
         return net;
     }
 
+    /**
+     * Builds a cluster of four junction nodes in a square loop with one portal inside the loop:
+     *
+     *   J0 --- J1
+     *   |   Pi  |
+     *   J3 --- J2
+     *
+     * Each junction has one portal pointing outward; Pi is an additional portal
+     * positioned inside the square loop and connected to J0. It should be removed
+     * by removePortalsIfCircle.
+     */
+    private static CorridorNetwork fourJunctionSquareWithInnerPortal() {
+        CorridorNetwork net = emptyNet();
+        CorridorGraph g = net.graph;
+
+        float s = 5f;
+        GraphNode j0 = addNode(g, -s, 1.25f,  s, PointKind.VOXEL_CENTER);
+        GraphNode j1 = addNode(g,  s, 1.25f,  s, PointKind.VOXEL_CENTER);
+        GraphNode j2 = addNode(g,  s, 1.25f, -s, PointKind.VOXEL_CENTER);
+        GraphNode j3 = addNode(g, -s, 1.25f, -s, PointKind.VOXEL_CENTER);
+
+        GraphNode p0 = addNode(g, -s * 3f, 1.25f,  s,    PointKind.EDGE_MID); // West  of J0
+        GraphNode p1 = addNode(g,  s * 3f, 1.25f,  s,    PointKind.EDGE_MID); // East  of J1
+        GraphNode p2 = addNode(g,  s * 3f, 1.25f, -s,    PointKind.EDGE_MID); // East  of J2
+        GraphNode p3 = addNode(g, -s * 3f, 1.25f, -s,    PointKind.EDGE_MID); // West  of J3
+        GraphNode pi = addNode(g,  0f,     1.25f,  0f,   PointKind.EDGE_MID); // inside the loop
+
+        markJunction(j0); markJunction(j1); markJunction(j2); markJunction(j3);
+        populatePortalFrame(p0); populatePortalFrame(p1);
+        populatePortalFrame(p2); populatePortalFrame(p3);
+        populatePortalFrame(pi);
+
+        // Square edges
+        g.addUndirectedEdge(j0.id, j1.id);
+        g.addUndirectedEdge(j1.id, j2.id);
+        g.addUndirectedEdge(j2.id, j3.id);
+        g.addUndirectedEdge(j3.id, j0.id);
+
+        // Outer portals
+        g.addUndirectedEdge(j0.id, p0.id);
+        g.addUndirectedEdge(j1.id, p1.id);
+        g.addUndirectedEdge(j2.id, p2.id);
+        g.addUndirectedEdge(j3.id, p3.id);
+
+        // Inner portal connected to J0 (should be removed by removePortalsIfCircle)
+        g.addUndirectedEdge(j0.id, pi.id);
+
+        return net;
+    }
+
     // -----------------------------------------------------------------------
     // Contract: null guard
     // -----------------------------------------------------------------------
@@ -540,6 +590,14 @@ class JunctionBuilderTest {
             CorridorNetwork net = fourJunctionSquare();
             assertDoesNotThrow(() ->
                     JunctionBuilder.buildJunctionCornerLinks(net, ROUTING_EDGE));
+        }
+
+        @Test @DisplayName("Portal inside junction square loop is removed")
+        void portalInsideLoopRemoved() {
+            CorridorNetwork net = fourJunctionSquareWithInnerPortal();
+            JunctionBuilder.buildJunctionCornerLinks(net, ROUTING_EDGE);
+            assertEquals(4, net.junctionLinksByJunctionAndPortal.size(),
+                    "Portal inside the cycle polygon must be removed by removePortalsIfCircle");
         }
     }
 
